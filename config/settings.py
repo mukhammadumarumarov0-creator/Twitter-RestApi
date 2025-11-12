@@ -81,6 +81,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'api',
+    'drf_spectacular_sidecar',
     'drf_spectacular',
     'rest_framework_simplejwt',
     
@@ -194,3 +195,11 @@ MEDIA_URL=  'media/'
 AUTH_USER_MODEL = "api.User"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Replace with your email host (e.g., 'smtp.gmail.com')
+EMAIL_PORT = 587  # Or 465 for SSL
+EMAIL_USE_TLS = True  # Or EMAIL_USE_SSL = True for port 465
+EMAIL_HOST_USER = 'mukhammadumarumarov0@gmail.com'
+EMAIL_HOST_PASSWORD = 'fbwo rdyh wjeq zorl' # Use an app-specific password if available (e.g., for Gmail)
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

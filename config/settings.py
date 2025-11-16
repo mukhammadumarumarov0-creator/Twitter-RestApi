@@ -93,7 +93,6 @@ UNFOLD = {
     "SITE_SUBHEADER": "Twitter Api | admin panel",}
 
 REST_FRAMEWORK = {
-    # YOUR SETTINGS
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -104,7 +103,9 @@ SPECTACULAR_SETTINGS = {
     'SWAGGER_UI_DIST': 'SIDECAR',  # shorthand to use the sidecar instead
     'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
     'REDOC_DIST': 'SIDECAR',
-    # OTHER SETTINGS
+    'TITLE': 'Twitter Api',
+    'DESCRIPTION': 'Twitter Api doc.',
+    'VERSION': '1.0.0',
 }
 
 MIDDLEWARE = [

@@ -54,8 +54,7 @@ class User(AbstractUser):
 
 class UserConfirmation(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE,related_name="confirmations")
-    code=models.PositiveIntegerField()
-    is_expired=models.BooleanField(null=True,blank=True,default=False)
+    code=models.CharField(max_length=4)
     expired_time=models.DateTimeField()
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
@@ -64,11 +63,12 @@ class UserConfirmation(models.Model):
         self.expired_time=timezone.now()+timezone.timedelta(minutes=2)
         return super().save(*args, **kwargs)
     
-    def isExpired(self):
+    def is_expired(self):
         if self.expired_time > timezone.now():
-            return False
-        return True
-    
+            return False #vaqti bor
+        return True #vaqti otib keti
+      
+      
     def __str__(self):
         return f"{self.user.username}'s confirmation code {self.code}"
     

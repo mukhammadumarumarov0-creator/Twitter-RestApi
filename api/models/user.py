@@ -52,6 +52,11 @@ class User(AbstractUser):
         }
         return data
 
+    def get_access_token(self):
+        refresh=RefreshToken.for_user(self)
+
+        return str(refresh.access_token)
+
 class UserConfirmation(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE,related_name="confirmations")
     code=models.CharField(max_length=4)
@@ -72,4 +77,25 @@ class UserConfirmation(models.Model):
     def __str__(self):
         return f"{self.user.username}'s confirmation code {self.code}"
     
+class ChangeUsersPassword(models.Model):
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    access_token=models.CharField(max_length=600)
+    is_active=models.BooleanField(default=False)
+    created_at=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now=True)
 
+    def save(self,*args, **kwargs):
+        self.access_token = self.user.get_access_token()
+        return super().save(*args, **kwargs)
+    
+    def active_mode(self):
+        self.is_active=True
+        self.save()
+    
+    def is_active_user(self):
+        if self.is_active == True:
+            return True
+        return False
+    
+        
+        

@@ -1,10 +1,12 @@
 from rest_framework.views import APIView
-from rest_framework.response import Response
-from api.models import User,UserConfirmation,CODE_VERIFIED,DONE
-from api.serializers import EmailSerializer,CodeVirificationSerializer,UpdateValidatedUserSerializer
-from api.utils import send_code_to_email,MyResponse
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import UpdateAPIView
+from api.models import User,CODE_VERIFIED,DONE,ChangeUsersPassword
+from api.serializers import EmailSerializer,CodeVirificationSerializer,UpdateValidatedUserSerializer,LoginSerializer,\
+   PasswordUpdateSerializer
+from api.utils import send_code_to_email,send_token_to_email,MyResponse
+from rest_framework.permissions import IsAuthenticated,AllowAny
+from django.contrib.auth import authenticate
+from api.permission import IsAuthAndDone
+
 
 class SendEmailCodeApiView(APIView):
     serializer_class=EmailSerializer
@@ -94,9 +96,85 @@ class UpdateVerifedUserApiView(APIView):
             )
 
         
+class LoginUserApiView(APIView):
+    serializer_class = LoginSerializer
 
+    def post(self,request):
+        serializer=self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        password=serializer.validated_data.get("password")
+        username=serializer.validated_data.get("username")
+
+        user=authenticate(request,username=username,password=password)
+        if user is not None:
+            return MyResponse.success(
+                message=" User Logged in seccessfuly",
+                data=user.get_token()
+            )
+
+        return MyResponse.error(
+            "username or password or email is not valid"
+        )
+
+
+
+class GetChangePasswordToken(APIView):
+    permission_classes = [IsAuthAndDone]
+    def get(self, request):
+        try:
+            user = User.objects.get(username=request.user.username)
+            users_token = ChangeUsersPassword.objects.filter(user=user).last()
+        except :
+            return MyResponse.error("No such user")
+
+        if not users_token:
+            users_token = ChangeUsersPassword.objects.create(user=user)
+        if not users_token.is_active:
+            send_token_to_email(
+                email=user.email,
+                token=users_token.access_token
+            )
+            users_token.active_mode()
+
+            return MyResponse.success(
+                "Token has been sent to your email",
+                users_token.access_token
+            )
+        
+        return MyResponse.error(
+            "Token already has been sent to your email"
+        )
     
 
+
+class PasswordUpdateView(APIView):
+    serializer_class = PasswordUpdateSerializer
+    permission_classes = [AllowAny]
+
+    def patch(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+       
+        try:
+            user_p=ChangeUsersPassword.objects.get(access_token=serializer.validated_data.get("access_token"))
+            user=User.objects.get(username=user_p.user.username)
+            user.set_password(serializer.validated_data.get("new_password"))
+            user_p.is_active=False
+            user.save()
+            user_p.save()
+        except:
+            return MyResponse.error("Invalid data was entered")
+
+        return MyResponse.success("Password has been updated successfully")
+
+
+
+        
+
+
+       
+        
 
     
    

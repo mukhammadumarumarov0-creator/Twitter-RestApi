@@ -4,7 +4,7 @@ from django.core.validators import FileExtensionValidator
 
 
 class Post(models.Model):
-    user=models.ForeignKey(User,on_delete=models.CASCADE , related_name="posts")
+    user=models.ForeignKey(User,on_delete=models.CASCADE , related_name="posts",null=True,blank=True)
     content = models.TextField()
     liked_user=models.ManyToManyField(User,related_name="liked_post",blank=True)
     viewed_user=models.ManyToManyField(User,related_name="viewed_post",blank=True)

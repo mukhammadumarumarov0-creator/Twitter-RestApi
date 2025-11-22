@@ -1,7 +1,7 @@
 from django.db import models
 from api.models.user import User
 from api.models.post import Post
-from django.core.validators import FileExtensionValidator
+
 
 
 class Comment(models.Model):

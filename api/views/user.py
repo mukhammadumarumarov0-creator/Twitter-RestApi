@@ -1,13 +1,15 @@
 from rest_framework.views import APIView
-from api.models import User,CODE_VERIFIED,DONE,ChangeUsersPassword
-from api.serializers import EmailSerializer,CodeVirificationSerializer,UpdateValidatedUserSerializer,LoginSerializer,\
-   PasswordUpdateSerializer
-from api.utils import send_code_to_email,send_token_to_email,MyResponse
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from django.contrib.auth import authenticate
+from drf_spectacular.utils import extend_schema
+
+from api.models import User,CODE_VERIFIED,DONE,ChangeUsersPassword
+from api.serializers import EmailSerializer,CodeVirificationSerializer,UpdateValidatedUserSerializer,\
+    LoginSerializer,PasswordUpdateSerializer
+from api.utils import send_code_to_email,send_token_to_email,MyResponse
 from api.permission import IsAuthAndDone
 
-
+@extend_schema(tags=["Authentication"])
 class SendEmailCodeApiView(APIView):
     serializer_class=EmailSerializer
     def post(self,request):
@@ -20,7 +22,7 @@ class SendEmailCodeApiView(APIView):
         send_code_to_email(email,user.get_verify_code())
         return MyResponse.success(message="Verification code sent to your email address",data=user.get_token())
    
-
+@extend_schema(tags=["Authentication"])
 class VerificationApiView(APIView):
     permission_classes=[IsAuthenticated]
     serializer_class=CodeVirificationSerializer
@@ -39,7 +41,6 @@ class VerificationApiView(APIView):
              message = "code dosen't match or expired",
             )
 
-    
     def code_verification(self,code:str,user:User):
         validate_code=user.confirmations.order_by("-created_at").first()
         if validate_code.code == code and not validate_code.is_expired():
@@ -47,7 +48,7 @@ class VerificationApiView(APIView):
             user.save()
             return True
 
-
+@extend_schema(tags=["Authentication"])
 class ResentCodeApiView(APIView):
     permission_classes=[IsAuthenticated]
     def get(self,request):
@@ -56,7 +57,7 @@ class ResentCodeApiView(APIView):
             return MyResponse.error(message="Code hasn't been expired yet")
         return MyResponse.success(message="Verification code sent to your email address",data=user.get_token())
        
- 
+@extend_schema(tags=["Authentication"])
 class UpdateVerifedUserApiView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UpdateValidatedUserSerializer
@@ -95,7 +96,7 @@ class UpdateVerifedUserApiView(APIView):
                 message="You should pass through verifaction first"
             )
 
-        
+@extend_schema(tags=["Authentication"])       
 class LoginUserApiView(APIView):
     serializer_class = LoginSerializer
 
@@ -117,8 +118,7 @@ class LoginUserApiView(APIView):
             "username or password or email is not valid"
         )
 
-
-
+@extend_schema(tags=["Authentication"])
 class GetChangePasswordToken(APIView):
     permission_classes = [IsAuthAndDone]
     def get(self, request):
@@ -146,8 +146,7 @@ class GetChangePasswordToken(APIView):
             "Token already has been sent to your email"
         )
     
-
-
+@extend_schema(tags=["Authentication"])
 class PasswordUpdateView(APIView):
     serializer_class = PasswordUpdateSerializer
     permission_classes = [AllowAny]

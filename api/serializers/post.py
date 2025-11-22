@@ -25,8 +25,11 @@ class MyPostsSerialzer(serializers.ModelSerializer):
         model = Post
         fields = "__all__"
 
-
-            
+class PostsLikeSeriazlier(serializers.ModelSerializer):
+     user=UserMiniSerializer()
+     class Meta:
+          model=Post
+          fields = "__all__"      
        
                   
 

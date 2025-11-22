@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import SendEmailCodeApiView,VerificationApiView,ResentCodeApiView,UpdateVerifedUserApiView,LoginUserApiView,\
    GetChangePasswordToken,PasswordUpdateView,CreatePost,DeletePost,AllMyPosts,GetMyPost,CreateComent,CommentDetail,\
-   AllMyComments,PostComments
+   AllMyComments,PostComments,Like_to_Post,AllMyLikes,Post_View,AllMyViews
 
 urlpatterns = [
     # Auth
@@ -25,6 +25,13 @@ urlpatterns = [
   path("posts_comment/<int:pk>",PostComments.as_view()),
   path("comment_detail/<int:pk>/",CommentDetail.as_view()),
 
+  # Like
+  path("like/<int:pk>/",Like_to_Post.as_view()),
+  path("my_liked_posts/",AllMyLikes.as_view()),
+
+  # Views
+  path("view_post/<int:pk>",Post_View.as_view()),
+  path("all_viewd_posts/",AllMyViews.as_view()),
 
 
 ]

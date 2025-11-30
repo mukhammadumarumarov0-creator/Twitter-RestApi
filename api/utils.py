@@ -6,7 +6,7 @@ import re
 
 
 def send_code_to_email(email,code):
-    text = f"Assalomu alaykum Twitter api uchun tastiqlash kodi : {code}"
+    text = f"Hi, This is your Confirmation code For Twitter: {code}"
     send_mail(
         subject="Confirmation Code",
         message=text,
